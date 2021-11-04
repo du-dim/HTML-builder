@@ -9,11 +9,12 @@ let linkFile2 = path.join(__dirname, 'project-dist', 'bundle.css');
 let myWriteStream = fs.createWriteStream(linkFile2,'utf-8');
 myWriteStream.on('error', (err) => console.log(err.message));
 
-fs.readdir(linkFile1, (err, files) => {
+fs.readdir(linkFile1, { withFileTypes: true }, (err, files) => {
     if (err) throw err;
-    files.forEach(f => {             
-        if (path.extname(f) === '.css') {
-            let myReadStream = fs.createReadStream(path.join(linkFile1, f), 'utf-8');
+    files.forEach(f => {      
+        extension = f.name.split('.').slice(-1).join('');
+        if (extension === 'css' && f.isFile()) {           
+            let myReadStream = fs.createReadStream(path.join(linkFile1, f.name), 'utf-8');
             myReadStream.on('error', (err) => console.log(err.message));
             let rl = readline.createInterface({
                 input: myReadStream                            
