@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
+//const readline = require('readline');
 
 
 let linkFile1 = path.join(__dirname, 'styles');
@@ -16,12 +16,7 @@ fs.readdir(linkFile1, { withFileTypes: true }, (err, files) => {
         if (extension === 'css' && f.isFile()) {           
             let myReadStream = fs.createReadStream(path.join(linkFile1, f.name), 'utf-8');
             myReadStream.on('error', (err) => console.log(err.message));
-            let rl = readline.createInterface({
-                input: myReadStream                            
-            });
-            rl.on('line', (line) => {                
-                myWriteStream.write(line + '\n');
-            });              
+            myReadStream.pipe(myWriteStream);          
         }  
     });            
 });

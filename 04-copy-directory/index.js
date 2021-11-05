@@ -14,8 +14,8 @@ function copyDir(a, b) {
         if (err) throw err;
         files.forEach(f => {
             if (f.isFile()) {
-                let myReadStream = fs.createReadStream(path.join(a, f.name), 'utf-8');
-                let myWriteStream = fs.createWriteStream(path.join(b, f.name),'utf-8');
+                let myReadStream = fs.createReadStream(path.join(a, f.name));
+                let myWriteStream = fs.createWriteStream(path.join(b, f.name));
                 myReadStream.pipe(myWriteStream);
                 myReadStream.on('error', (err) => console.log(err.message));
                 myWriteStream.on('error', (err) => console.log(err.message));
