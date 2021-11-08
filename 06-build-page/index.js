@@ -8,6 +8,7 @@ let linkStyles = path.join(__dirname, 'styles');
 let linkComp = path.join(__dirname, 'components');
 let linkAssets = path.join(__dirname, 'assets');
 
+
 fs.mkdir(linkProject, { recursive: true }, (err) => {
     if (err) throw err;    
 });
@@ -17,24 +18,30 @@ let htmlWriteStream = fs.createWriteStream(path.join(linkProject, 'index.html'),
 htmlWriteStream.on('error', (err) => console.log(err.message));
 let htmlReadStream = fs.createReadStream(path.join(linkTemp), 'utf-8');
 htmlReadStream.on('error', (err) => console.log(err.message));
-let rl_HTML = readline.createInterface({
-    input: htmlReadStream                            
-});
 
-rl_HTML.on('line', (line) => { 
-    if (line.search(/{{(.+)}}/) >= 0) {
-        nameComponent = line.replace(/.*{{(.+)}}.*/, '$1').trim();        
-        let componentReadStream = fs.createReadStream(path.join(linkComp, `${nameComponent}.html`), 'utf-8');
-        componentReadStream.on('error', (err) => console.log(err.message));
-        let rl_Component = readline.createInterface({
-            input: componentReadStream                            
-        });
-        rl_Component.on('line', (str) => {
-            htmlWriteStream.write(str + '\n')
-        });
+
+let arrHTML = [];
+async function createArr() {
+    let rl_HTML = readline.createInterface({
+        input: htmlReadStream,
+        crlfDelay: Infinity                      
+    });
+    for await (const line of rl_HTML) {
+        arrHTML.push(line);
     }
-    else htmlWriteStream.write(line + '\n');
-});    
+    for (let i = 0; i < arrHTML.length-1; i++) { 
+        if (arrHTML[i].search(/{{(.+)}}/) >= 0) {
+            nameComponent = arrHTML[i].replace(/{{(.+)}}/, '$1').trim();        
+            let componentReadStream = fs.createReadStream(path.join(linkComp, `${nameComponent}.html`), 'utf-8');
+            componentReadStream.on('error', (err) => console.log(err.message));
+            arrHTML[i] = arrHTML[i].replace(/{{(.+)}}/, '');
+            componentReadStream.on('data', chunk => {arrHTML[i] = arrHTML[i] + chunk});
+        }            
+    }
+    setTimeout(() => {htmlWriteStream.write(arrHTML.join('\n'))}, 2000)   
+}
+createArr();
+
 
 ////////////////
 let styleWriteStream = fs.createWriteStream(path.join(linkProject, 'style.css'),'utf8');
@@ -52,7 +59,6 @@ fs.readdir(linkStyles, { withFileTypes: true }, (err, files) => {
 });
 
 ////////////////
-
 copyDir(linkAssets, path.join(linkProject, 'assets'));
 
 function copyDir(a, b) {
