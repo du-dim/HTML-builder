@@ -1,5 +1,5 @@
 
-/*
+
 const fs = require('fs');
 const path = require('path');
 
@@ -21,22 +21,3 @@ fs.readdir(linkFile1, { withFileTypes: true }, (err, files) => {
     });            
 });
 
-*/
-/*
-const { readdir, readFile, writeFile, stat, appendFile } = require('fs/promises');
-const { join, extname } = require('path');
-
-const stylesPath = join(__dirname, 'styles');
-const bandlePath = join(__dirname, 'files-copy', 'project-dist', 'bundle.css');
-
-async function createStyleFile () {
-    await writeFile(bandlePath, '');
-    const items = await readdir(stylesPath, { withFileTypes: true });
-    for (let item of items) {
-        await readFile(stylesPath, item)
-            if (item.isFile() == true && extname(item).slice(1) == 'css');
-            await appendFile(bandlePath);
-        }
-}
-createStyleFile();
-*/
