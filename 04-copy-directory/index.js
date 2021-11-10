@@ -6,7 +6,7 @@ let linkFile2 = path.join(__dirname, 'files-copy');
 
 deleteFile(linkFile2);
 //deleteFolder(linkFile2);
-copyDir(linkFile1, linkFile2);
+setTimeout(() => {copyDir(linkFile1, linkFile2)},1000);
 
 function copyDir(a, b) {
     fs.mkdir(b, { recursive: true }, (err) => {
