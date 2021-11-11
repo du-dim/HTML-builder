@@ -31,12 +31,15 @@ async function createArr() {
     }
     for (let i = 0; i < arrHTML.length-1; i++) { 
         if (arrHTML[i].search(/{{(.+)}}/) >= 0) {
-            nameComponent = arrHTML[i].replace(/{{(.+)}}/, '$1').trim();        
+            let comp = '';
+            nameComponent = arrHTML[i].replace(/.*{{(.+)}}.*/, '$1').trim();        
             let componentReadStream = fs.createReadStream(path.join(linkComp, `${nameComponent}.html`), 'utf-8');
             componentReadStream.on('error', (err) => console.log(err.message));
-            arrHTML[i] = arrHTML[i].replace(/{{(.+)}}/, '');
-            componentReadStream.on('data', chunk => {arrHTML[i] = arrHTML[i] + chunk});
-        }            
+            componentReadStream.on('data', chunk => {comp = comp + chunk});
+            componentReadStream.on('end', () => {
+              arrHTML[i] = arrHTML[i].replace(/{{(.+)}}/, comp);
+            });            
+        }              
     }
     setTimeout(() => {htmlWriteStream.write(arrHTML.join('\n'))}, 2000)   
 }
